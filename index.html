@@ -634,7 +634,7 @@ const commit=()=>{save();render()};
 const toast=t=>{const e=document.createElement('div');e.className='ts';e.textContent=t;document.body.append(e);setTimeout(()=>e.remove(),2600)};
 function ask(title,fs,ok,btn='Добавить'){const m=document.createElement('div');m.className='ov';
 m.innerHTML=`<div class="md"><h3>${title}</h3>${fs.map(f=>`<label data-fwrap="${f.k}">${f.l}${fld(f)}</label>`).join('')}<div class="row"><button class="b pri" id="ok">${btn}</button><button class="b" id="no">Отмена</button></div></div>`;
-document.body.append(m);const x=()=>m.remove();m.querySelector('#no').onclick=x;m.onclick=e=>e.target==m&&x();m.querySelector('input:not([type=hidden]),textarea')?.focus();
+document.body.append(m);const x=()=>m.remove();m.querySelector('#no').onclick=x;m.onclick=e=>{if(e.target==m)x()};m.querySelector('input:not([type=hidden]),textarea')?.focus();
 const syncRepeat=()=>{const r=m.querySelector('[name="r"]')?.value||'';const w=m.querySelector('[data-fwrap=rw]'),d=m.querySelector('[data-fwrap=rm]');if(w)w.style.display=r=='w'?'grid':'none';if(d)d.style.display=r=='m'?'grid':'none'};syncRepeat();
 m.querySelector('#ok').onclick=()=>{const o={};m.querySelectorAll('[name]').forEach(i=>o[i.name]=i.value.trim());if(o.r=='w'&&!o.rw){toast('Выбери день недели');return}if(o.r=='m'&&!o.rm){toast('Выбери число месяца');return}if(ok(o)!==false){x();commit()}}}
 const tbl=(h,r,e)=>`<div class="tw"><table><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${r.length?r.join(''):`<tr><td colspan="${h.length}" class="em">${e}</td></tr>`}</tbody></table></div>`;
