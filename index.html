@@ -557,12 +557,12 @@ button,.hc,.hc2,.cd,.stb{touch-action:manipulation}
 .wi:last-child{border-bottom:0}
 .wmw{display:flex;gap:12px;align-items:flex-start;min-width:0}
 .wm{flex:1;min-width:0;display:grid;gap:6px}
-.wth{width:64px;height:64px;flex:none;object-fit:cover;border-radius:12px;border:1px solid var(--line2);background:var(--in);cursor:zoom-in}
-.wimgf{display:flex;align-items:center;gap:12px}
-.wimgp{width:76px;height:76px;flex:none;border-radius:14px;border:1px dashed var(--line2);background:var(--in);display:grid;place-items:center;color:var(--dim);overflow:hidden}
-.wimgp img{width:100%;height:100%;object-fit:cover;display:block}.wimgp svg{width:26px;height:26px}
+.wth{width:104px;height:104px;flex:none;object-fit:contain;border-radius:12px;border:1px solid var(--line2);background:var(--in);cursor:zoom-in}
+.wimgf{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.wimgp{width:128px;height:128px;flex:none;border-radius:14px;border:1px dashed var(--line2);background:var(--in);display:grid;place-items:center;color:var(--dim);overflow:hidden}
+.wimgp img{width:100%;height:100%;object-fit:contain;display:block}.wimgp svg{width:26px;height:26px}
 .wimgb{display:grid;gap:8px;justify-items:start}
-@media(min-width:761px){.wth{width:72px;height:72px}}
+@media(min-width:761px){.wth{width:132px;height:132px}}
 .wt{font-size:15px;font-weight:500;line-height:1.35;overflow-wrap:anywhere}
 .wtg{display:flex;flex-wrap:wrap;gap:6px}
 .wn{font-size:12.5px;color:var(--mute);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
@@ -914,7 +914,7 @@ const imgOk=s=>typeof s=='string'&&/^data:image\/(jpeg|png|webp);base64,/.test(s
 const IMGI=SV('<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/>');
 const wTh=w=>imgOk(w.img)?`<img class="wth" src="${E(w.img)}" alt="" loading="lazy" data-a="wzoom" data-id="${w.id}">`:'';
 function wImgFld(f){const ok=imgOk(f.v),fid='wimg-'+uid();return `<input type="hidden" name="${f.k}" value="${ok?E(f.v):''}"><div class="wimgf"><div class="wimgp">${ok?`<img src="${E(f.v)}" alt="">`:IMGI}</div><div class="wimgb"><button type="button" class="b" data-a="wimgpick">${ok?'Заменить фото':'Прикрепить фото'}</button><button type="button" class="b" data-a="wimgdel"${ok?'':' style="display:none"'}>Убрать</button></div><input id="${fid}" type="file" accept="image/*" data-c="wimg" style="display:none"></div>`}
-function wResize(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{const M=480,k=Math.min(1,M/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.width*k));c.height=Math.max(1,Math.round(im.height*k));const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);res(c.toDataURL('image/jpeg',.72))};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('img'))};im.src=u})}
+function wResize(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{const M=720,k=Math.min(1,M/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.width*k));c.height=Math.max(1,Math.round(im.height*k));const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);res(c.toDataURL('image/jpeg',.72))};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('img'))};im.src=u})}
 OPTS.wpri=[['h','Очень хочу','#ff6b7d'],['m','Хочу','#f5c542'],['l','Когда-нибудь','#94a3b8']];
 OPTS.wcat=[['','Без категории','#94a3b8','M5 12h.01M12 12h.01M19 12h.01'],['Электроника','Электроника','#60a5fa','M7 3h10a1 1 0 011 1v16a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1zM11 18h2'],['Одежда и обувь','Одежда и обувь','#a78bfa','M8 4L3 7l2 4 3-1v10h8V10l3 1 2-4-5-3a4 4 0 01-8 0z'],['Дом','Дом','#2dd4bf','M3 11l9-8 9 8M5 10v10h14V10M10 20v-6h4v6'],['Авто','Авто','#fb923c','M5 16V7a3 3 0 013-3h8a3 3 0 013 3v9M5 16h14M5 16v2h3v-2M16 16v2h3v-2M5 11h14'],['Спорт и хобби','Спорт и хобби','#34d399','M3 10v4M6 8v8M18 8v8M21 10v4M6 12h12'],['Подарки','Подарки','#f472b6',GIFT],['Свадьба','Свадьба','#e58dbb','M12 20s-7-4.4-7-10a4 4 0 017-2.5A4 4 0 0119 10c0 5.6-7 10-7 10z'],['Духи','Духи','#c084a5','M9 3h6v3H9zM10 6h4v3h-4zM7 9h10a2 2 0 012 2v9H5v-9a2 2 0 012-2zM9 13h6']];
 OPTS.wfc=[['','Все категории','#94a3b8','M4 6h16M4 12h16M4 18h16'],...OPTS.wcat.slice(1)];
