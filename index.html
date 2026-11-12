@@ -567,6 +567,8 @@ button,.hc,.hc2,.cd,.stb{touch-action:manipulation}
 .wtg{display:flex;flex-wrap:wrap;gap:6px}
 .wn{font-size:12.5px;color:var(--mute);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
 .wp{font-weight:600;font-size:15px;white-space:nowrap;text-align:right}
+.wpr{font-weight:600;font-size:17px;line-height:1.2;white-space:nowrap}
+.wi:not(.wb){grid-template-columns:minmax(0,1fr)}
 .wa{grid-column:1/-1;display:flex;align-items:center;gap:6px}
 .wsp{flex:1}
 .wa .b.ic{width:36px;height:36px;min-width:36px}
@@ -577,7 +579,7 @@ button,.hc,.hc2,.cd,.stb{touch-action:manipulation}
 .wpi{width:128px;text-align:right;padding:6px 10px}
 .wlk{text-decoration:none;gap:5px}.wlk svg{width:12px;height:12px}.wlk:hover{color:var(--acc);border-color:var(--acc)}
 .wb .dt{min-width:0;height:36px;display:inline-flex;align-items:center}
-@media(min-width:761px){.wi{grid-template-columns:minmax(0,1fr) auto auto;align-items:center}.wa{grid-column:auto}}
+@media(min-width:761px){.wi{grid-template-columns:minmax(0,1fr) auto auto;align-items:center}.wi:not(.wb){grid-template-columns:minmax(0,1fr) auto}.wa{grid-column:auto}}
 @media(max-width:760px){.wbuy{flex:0 1 190px;justify-content:center}}
 
 /* ===== Mobile: pinned compact navigation ===== */
@@ -928,7 +930,7 @@ function wSave(o,w){if(!o.t){toast('Введи название товара');r
 function wItems(st){const q=WQ.trim().toLowerCase();return WL().map((w,i)=>({w,i})).filter(x=>wst(x.w)==st&&(!WFC||x.w.c==WFC)&&(!q||((x.w.t||'')+' '+(x.w.n||'')+' '+(x.w.c||'')).toLowerCase().includes(q)))}
 const wTags=w=>{const u=fixUrl(w.u||''),h=u?hostOf(u):'';return [w.c?`<span class="tg">${OL('wcat',w.c)}</span>`:'',u?`<a class="tg wlk" href="${E(u)}" target="_blank" rel="noopener noreferrer">${LNK}${E(h||'ссылка')}</a>`:''].join('')};
 function wRow(x,flat){const w=x.w,pc=OPTS.wpri.find(o=>o[0]==(w.pr||'m'))||OPTS.wpri[1],tg=wTags(w)+(w.ad?`<span class="tg">${D(w.ad)}</span>`:'');
-return `<div class="wi"><div class="wmw">${wTh(w)}<div class="wm"><div class="wt">${flat?`<u class="dot" style="background:${pc[2]};margin-right:8px;vertical-align:1px" title="${pc[1]}"></u>`:''}${E(w.t)}</div>${tg?`<div class="wtg">${tg}</div>`:''}${w.n?`<div class="wn">${E(w.n)}</div>`:''}</div></div><div class="wp">${+w.p?R(+w.p):''}</div><div class="wa"><button class="b wbuy" data-a="wbuy" data-id="${w.id}">${IC_OK} Куплена</button><span class="wsp"></span><button class="b ic" data-a="wedit" data-id="${w.id}" title="Редактировать">${PEN}</button>${X('wl',x.i)}</div></div>`}
+return `<div class="wi"><div class="wmw">${wTh(w)}<div class="wm"><div class="wt">${flat?`<u class="dot" style="background:${pc[2]};margin-right:8px;vertical-align:1px" title="${pc[1]}"></u>`:''}${E(w.t)}</div>${tg?`<div class="wtg">${tg}</div>`:''}${+w.p?`<div class="wpr">${R(+w.p)}</div>`:''}${w.n?`<div class="wn">${E(w.n)}</div>`:''}</div></div><div class="wa"><button class="b wbuy" data-a="wbuy" data-id="${w.id}">${IC_OK} Куплена</button><span class="wsp"></span><button class="b ic" data-a="wedit" data-id="${w.id}" title="Редактировать">${PEN}</button>${X('wl',x.i)}</div></div>`}
 function wbRow(x){const w=x.w,tg=wTags(w);
 return `<div class="wi wb"><div class="wmw">${wTh(w)}<div class="wm"><div class="wt">${E(w.t)}</div>${tg?`<div class="wtg">${tg}</div>`:''}${w.n?`<div class="wn">${E(w.n)}</div>`:''}</div></div><div class="wp"><input class="wpi" value="${w.bp!=null&&w.bp!==''?RI(+w.bp):''}" placeholder="Сколько, ₽" inputmode="decimal" data-fmt="rub" data-c="wbp" data-id="${w.id}" aria-label="Сколько заплачено"></div><div class="wa"><label class="dt" data-a="pick" title="Дата покупки"><span>${D(w.bd||TD)}</span><input type="date" value="${w.bd||TD}" data-c="wbd" data-id="${w.id}"></label><span class="wsp"></span><button class="b wback" data-a="wback" data-id="${w.id}" title="Вернуть в вишлист">${IC_UN} Вернуть</button>${X('wl',x.i)}</div></div>`}
 const wMonthSum=m=>wItems('bought').filter(x=>(x.w.bd||'').slice(0,7)==m).reduce((s,x)=>s+pd(x.w),0);
