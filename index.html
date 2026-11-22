@@ -232,6 +232,18 @@ h1{font-size:23px;margin-bottom:16px}
 .donut-cat i svg{width:13px;height:13px;stroke:#111;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .donut-legend .lp{font-size:10px;white-space:nowrap;margin-left:auto}
 .donut-legend .lr b{font-size:11px;font-weight:600;white-space:nowrap}
+.dseg{cursor:pointer;transition:opacity .15s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;outline:none}
+.dbd{pointer-events:none;transition:opacity .15s}
+.dn.dim .dseg:not(.on),.dn.dim .dbd:not(.on){opacity:.28}
+.dc3{font:600 11px Inter,system-ui,sans-serif;fill:var(--mute)}
+.donut-legend .lr{cursor:pointer;transition:border-color .12s,background .12s,opacity .15s;-webkit-tap-highlight-color:transparent}
+.donut-legend .lr.on{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 12%,var(--in))}
+.donut-legend.dim .lr:not(.on){opacity:.55}
+.h.dh{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dcol{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;font-size:12px}
+.dcol svg{width:15px;height:15px}
+.exf{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;margin-bottom:10px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.exf .sub{margin-left:auto;font-size:12px}
 @media(max-width:560px){.dn{max-width:290px}.donut-legend{gap:7px}.donut-legend .lr{padding:7px 9px;gap:6px}.donut-cat{font-size:11px}.donut-legend .lr b{font-size:10px}.donut-cat i{width:23px;height:23px}}
 /* ===== fixes: iPhone zoom, icon centering, sticky headers, habits on phones ===== */
 html{-webkit-text-size-adjust:100%}
@@ -374,7 +386,7 @@ want:[{t:'Остров доктора Моро',a:'Герберт Уэллс',o:
 habits:[{n:'Прогулка с собакой',d:{[sh(-1)]:1,[sh(-2)]:1,[sh(-3)]:1}},{n:'Велосипед',d:{[sh(-1)]:1,[sh(-3)]:1,[sh(-4)]:1}},{n:'Чтение',d:{[sh(-1)]:1}}]});
 const seedDbt=()=>{const L=[['2026-10-20',42207,{n:[42207,42200]}],['2026-11-05',56237,{t:[2000,2000],s:[19400,19400],n:[34537,36770]}],['2026-11-20',42207,{n:[10207]}],['2026-12-05',56237,{t:[2000],s:[19700],n:[26537],k:[8000]}],['2026-12-20',42207,{n:[42207]}],['2027-01-05',56237,{t:[2000],s:[19700],n:[26537],k:[8000]}],['2027-01-20',42207,{n:[42207]}],['2027-02-05',56237,{t:[2000],s:[19700],n:[26537],k:[8000]}],['2027-02-20',42207,{n:[42207]}],['2027-03-05',56237,{t:[2000],s:[19700],n:[34537],k:[8000]}],['2027-03-20',42207,{n:[42207]}],['2027-04-05',56237,{s:[19700],n:[28537],k:[8000]}],['2027-04-20',42207,{n:[42207]}],['2027-05-05',56237,{t:[1652.09],s:[19700],n:[26884.91],k:[8000]}],['2027-05-20',42207,{s:[17320.51],k:[24886.49]}],['2027-06-05',56237,{t:[49123.49],k:[7113.51]}],['2027-06-20',42207,{t:[27408.71]}]];
 return{src:[{id:'t',n:'ТБанк',t:81924,r:1,s:''},{id:'s',n:'Сбер кредит',t:142342,r:1.99,s:''},{id:'n',n:'Новый кредит',t:429000,r:2.49,s:''},{id:'k',n:'Кольца',t:80000,r:0,s:''}],rows:L.map(([d,b,x])=>({d,b,pl:Object.fromEntries(Object.entries(x).map(([k,v])=>[k,v[0]])),pf:Object.fromEntries(Object.entries(x).filter(([k,v])=>v[1]!=null).map(([k,v])=>[k,v[1]]))}))}};
-let S;try{S=JSON.parse(localStorage.getItem(K))}catch(e){}S=S||seed();S.wl=S.wl||[];if(!S.dbt){S.dbt=seedDbt();delete S.debts}S.exp.forEach(x=>{x.c={'Кафе':'Кафе и рестораны','Дом':'Жилищные расходы'}[x.c]||x.c});
+let S;try{S=JSON.parse(localStorage.getItem(K))}catch(e){}S=S||seed();S.wl=S.wl||[];S.cc=S.cc||{};if(!S.dbt){S.dbt=seedDbt();delete S.debts}S.exp.forEach(x=>{x.c={'Кафе':'Кафе и рестораны','Дом':'Жилищные расходы'}[x.c]||x.c});
 let cur='home',sub={fin:'debts',books:'read',wish:'want'},tm;
 const st=(t,w)=>{$('#stt').textContent=t;$('#dot').style.background=w?'var(--warn)':'var(--ok)'};
 const save=()=>{try{S.ts=Date.now();localStorage.setItem(K,JSON.stringify(S));st('Сохранено');window.__onSave&&window.__onSave()}catch(e){st('Не удалось сохранить в браузере',1)}};
@@ -443,12 +455,12 @@ function drawArch(){document.querySelectorAll('.ov.arch').forEach(x=>x.remove())
 function dArch(){const{src,rows}=S.dbt,L=rows.map((r,i)=>({r,i})).filter(x=>x.r.a),sum=L.reduce((a,x)=>a+src.reduce((b,s)=>b+(+x.r.pf[s.id]||0),0),0);
 return kp([['В архиве',L.length,'выплаченных дат'],['Выплачено по факту',R(sum),'по датам из архива']])+tbl(['Дата','Бюджет на оплату','Платёж план','Платёж факт','Остаток долга, факт','По источникам (факт)',''],L.map(x=>`<tr><td><b class="v">${D(x.r.d)}</b></td><td>${R(+x.r.b||0)}</td><td data-m="${x.i}:sp"></td><td data-m="${x.i}:sf"></td><td data-m="${x.i}:tf"></td><td class="l" data-m="${x.i}:d"></td><td style="white-space:nowrap"><button class="b ic" data-a="unarch" data-i="${x.i}" title="Вернуть из архива в таблицу">${IC_UN}</button>${X('dbt.rows',x.i)}</td></tr>`),'Архив пока пуст. Нажми ✓ справа у выплаченной даты в таблице долгов.')}
 const CATS=[['Продукты','M3 4h2l2.4 11h10.2l2-8H6.2M9 20a1 1 0 100-2 1 1 0 000 2zm8 0a1 1 0 100-2 1 1 0 000 2z','#B6E635'],['Кафе и рестораны','M5 8h11v6a4 4 0 01-4 4H9a4 4 0 01-4-4V8zM16 9h2a2 2 0 010 4h-2M8 3v2M12 3v2','#929292'],['Покупки','M6 8h12l1 12H5L6 8zM9 8a3 3 0 016 0','#C5F45A'],['Развлечения','M12 21a9 9 0 100-18 9 9 0 000 18zM10 8.5l5.5 3.5-5.5 3.5z','#686868'],['Здоровье','M10 4h4v6h6v4h-6v6h-4v-6H4v-4h6z','#A5A5A5'],['Спорт','M3 10v4M6 8v8M18 8v8M21 10v4M6 12h12','#A9D92D'],['Транспорт','M5 16V7a3 3 0 013-3h8a3 3 0 013 3v9M5 16h14M5 16v2h3v-2M16 16v2h3v-2M5 11h14M8.5 13.5h.01M15.5 13.5h.01','#5A5A5A'],['Жилищные расходы','M3 11l9-8 9 8M5 10v10h14V10M10 20v-6h4v6','#858585'],['Подписки','M20 12a8 8 0 01-14 5.3M4 12a8 8 0 0114-5.3M18 3v4h-4M6 21v-4h4','#BDBDBD'],['Переводы','M4 8h15M15 4l4 4-4 4M20 16H5M9 12l-4 4 4 4','#777777']];
-const cat=n=>{const c=CATS.find(x=>x[0]==n);return c?{n:c[0],p:c[1],c:c[2]}:{n:n||'Другое',p:'M5 12h.01M12 12h.01M19 12h.01',c:'#858585'}};
+const cat=n=>{const c=CATS.find(x=>x[0]==n),o=(S.cc||{})[n];return c?{n:c[0],p:c[1],c:o||c[2]}:{n:n||'Другое',p:'M5 12h.01M12 12h.01M19 12h.01',c:o||'#858585'}};
 const IC_CAL=SV('<path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"/>'),CHV=SV('<path d="M6 9l6 6 6-6"/>');
 const CI=n=>{const c=cat(n);return `<span class="cc"><i style="color:${c.c};background:color-mix(in srgb,${c.c} 16%,transparent)">${SV(`<path d="${c.p}"/>`)}</i>${E(c.n)}</span>`};
 const cap=t=>t?t[0].toUpperCase()+t.slice(1):'',DF=v=>v?new Date(v+'T00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}).replace(/\s?г\.$/,''):'Не выбрано';
 const fld=f=>f.t=='img'?wImgFld(f):f.t=='url'?`<input name="${f.k}" type="text" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="https://" value="${E(f.v)}">`:f.t=='pw'?`<input name="${f.k}" type="password" autocomplete="off" value="${E(f.v)}">`:f.t=='days'?`<input type="hidden" name="${f.k}" value="${E(f.v)}"><div class="dws">${['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map((w,i)=>`<button type="button" class="dw ${(','+f.v+',').includes(','+i+',')?'on':''}" data-a="dwt" data-i="${i}">${w}</button>`).join('')}</div>`:f.t=='sel'?`<input type="hidden" name="${f.k}" value="${E(f.v)}"><button type="button" class="b fld" data-a="self" data-o="${f.o}">${OL(f.o,f.v)}${CHV}</button>`:f.t=='area'?`<textarea name="${f.k}">${E(f.v)}</textarea>`:f.t=='date'?`<input type="hidden" name="${f.k}" value="${E(f.v)}"><button type="button" class="b fld" data-a="calf"><span>${DF(f.v)}</span>${IC_CAL}</button>`:f.t=='time'?`<input name="${f.k}" type="time" value="${E(f.v||'')}">`:f.t=='cat'?`<input type="hidden" name="${f.k}" value="${E(f.v)}"><button type="button" class="b fld" data-a="catf">${CI(f.v)}${CHV}</button>`:`<input name="${f.k}" type="text" ${f.t=='num'?'inputmode="decimal"':''} value="${E(f.v)}">`;
-let CAL=null,PER=(()=>{const n=new Date();return{a:iso(new Date(n.getFullYear(),n.getMonth(),1)),b:iso(new Date(n.getFullYear(),n.getMonth()+1,0))}})();
+let EXF='',CAL=null,PER=(()=>{const n=new Date();return{a:iso(new Date(n.getFullYear(),n.getMonth(),1)),b:iso(new Date(n.getFullYear(),n.getMonth()+1,0))}})();
 const closeCal=()=>{if(CAL){CAL.el.remove();CAL=null}};
 const popAt=(el,a)=>{const r=a.getBoundingClientRect(),w=el.offsetWidth,h=el.offsetHeight;el.style.left=Math.max(8,Math.min(r.left,innerWidth-w-8))+'px';el.style.top=(r.bottom+6+h>innerHeight&&r.top-h-6>8?r.top-h-6:r.bottom+6)+'px'};
 const presetRange=k=>{const n=new Date(),y=n.getFullYear(),m=n.getMonth();if(k=='m0')return{a:iso(new Date(y,m,1)),b:iso(new Date(y,m+1,0))};if(k=='m1')return{a:iso(new Date(y,m-1,1)),b:iso(new Date(y,m,0))};if(k=='d7')return{a:sh(-6),b:TD};if(k=='d30')return{a:sh(-29),b:TD};const d=S.exp.map(x=>x.d).sort();return{a:d[0]||TD,b:d.length?d[d.length-1]:TD}};
@@ -465,25 +477,32 @@ else if(d.p){const r=presetRange(d.p);cb(r.a,r.b);closeCal()}
 else if(d.ok){if(!st.f)return;cb(st.f,st.t||st.f);closeCal()}else if(d.x)closeCal()};draw()}
 function catOpen(a,val,cb){if(CAL&&CAL.a===a){closeCal();return}closeCal();const el=document.createElement('div');el.className='cal list';el.style.width=a.offsetWidth+'px';el.innerHTML=CATS.map(c=>`<button type="button" class="${c[0]==val?'sel2':''}" data-v="${E(c[0])}">${CI(c[0])}</button>`).join('');document.body.append(el);CAL={el,a};popAt(el,a);el.onclick=e=>{const b=e.target.closest('button');if(b){cb(b.dataset.v);closeCal()}}}
 const perLabel=()=>{const{a,b}=PER,B=new Date(b+'T00:00');if(a.slice(0,7)==b.slice(0,7)&&a.slice(8)=='01'&&+b.slice(8)==new Date(B.getFullYear(),B.getMonth()+1,0).getDate())return cap(B.toLocaleDateString('ru-RU',{month:'long',year:'numeric'}).replace(/\s?г\.$/,''));return a==b?DF(a):DF(a)+' — '+DF(b)};
+const PAL=SV('<circle cx="12" cy="12" r="9"/><circle cx="8.5" cy="11" r="1"/><circle cx="12" cy="7.8" r="1"/><circle cx="15.5" cy="11" r="1"/><path d="M12 21c-1.6 0-2-1.3-1.4-2.2.6-.9 1.2-1.3 1.2-2.4 0-1 .8-1.6 1.8-1.6H17"/>');
+const dnShort=n=>{n=String(n).toUpperCase();return n.length>13?n.slice(0,12)+'…':n};
+const dnSector=(a0,a1,R1,R2,rc)=>{const P=(r,a)=>[120+r*Math.cos(a),120+r*Math.sin(a)],q=p=>p[0].toFixed(2)+' '+p[1].toFixed(2),so=Math.asin(rc/(R2-rc)),si=Math.asin(rc/(R1+rc)),lo=Math.sqrt((R2-rc)**2-rc**2),li=Math.sqrt((R1+rc)**2-rc**2),bo=a1-a0-2*so>Math.PI?1:0,bi=a1-a0-2*si>Math.PI?1:0,f=`A${rc} ${rc} 0 0 1 `;
+return `M${q(P(R2,a0+so))}A${R2} ${R2} 0 ${bo} 1 ${q(P(R2,a1-so))}${f}${q(P(lo,a1))}L${q(P(li,a1))}${f}${q(P(R1,a1-si))}A${R1} ${R1} 0 ${bi} 0 ${q(P(R1,a0+si))}${f}${q(P(li,a0))}L${q(P(lo,a0))}${f}${q(P(R2,a0+so))}Z`};
 function donut(m,total){
-const r=82,C=2*Math.PI*r;let off=0;
-const es=Object.entries(m).sort((a,b)=>b[1]-a[1]);
-const segs=es.map(([n,v])=>{
- const c=cat(n),len=v/total*C,g=es.length>1?Math.min(7,len*.24):0;
- const mid=(off+len/2)/C*2*Math.PI-Math.PI/2;
- const x=120+Math.cos(mid)*r,y=120+Math.sin(mid)*r;
- const icon=(len/C*100)>=5?`<g transform="translate(${x.toFixed(2)} ${y.toFixed(2)})"><circle r="12.5" fill="${c.c}" stroke="var(--card)" stroke-width="1.5"/><path d="${c.p}" transform="translate(-8 -8) scale(.67)" fill="none" stroke="#111" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></g>`:'';
- const o=`<circle cx="120" cy="120" r="${r}" fill="none" stroke="${c.c}" stroke-width="31" stroke-linecap="round" stroke-dasharray="${Math.max(len-g,.01)} ${C}" stroke-dashoffset="${-off}" transform="rotate(-90 120 120)"><title>${E(c.n)}: ${R(v)} (${P(v,total)})</title></circle>${icon}`;
- off+=len;return o;
-}).join('');
-const logo=`<g transform="translate(120 76)" fill="none" stroke="var(--acc)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="-10" y="-9" width="20" height="20" rx="4"/><path d="M-5 -3h10M-5 1h7M-5 5h4"/></g>`;
-return `<div class="donut-wrap"><svg viewBox="0 0 240 240" class="dn" role="img" aria-label="Структура расходов: ${R(total)}"><circle cx="120" cy="120" r="${r}" fill="none" stroke="var(--line2)" stroke-width="31" opacity=".55"/>${segs}${logo}<text x="120" y="116" text-anchor="middle" class="dc1">${R(total)}</text><text x="120" y="137" text-anchor="middle" class="dc2">РАСХОДЫ</text></svg></div><div class="donut-legend">${es.map(([n,v])=>{const c=cat(n);return `<div class="lr"><span class="donut-cat"><i style="background:${c.c}">${SV(`<path d="${c.p}"/>`)}</i><span>${E(c.n)}</span></span><span class="lp">${P(v,total)}</span><b>${R(v)}</b></div>`}).join('')}</div>`;
+const r=82,W=31,R1=r-W/2,R2=r+W/2,C=2*Math.PI*r,T=2*Math.PI,es=Object.entries(m).sort((a,b)=>b[1]-a[1]),sel=EXF&&m[EXF]!=null?EXF:'';let off=0,segs='',bds='';
+es.forEach(([n,v])=>{
+ const c=cat(n),len=v/total*C,on=n==sel,at=`data-a="exf" data-n="${E(n)}" data-v="${v}" data-p="${P(v,total)}"`,g=es.length>1?Math.min(4,len*.3):0,ga=g/r;
+ let a0=-Math.PI/2+off/C*T+ga/2,a1=-Math.PI/2+(off+len)/C*T-ga/2;off+=len;
+ if(a1-a0<.02){const md=(a0+a1)/2;a0=md-.01;a1=md+.01}
+ if(es.length==1){segs+=`<circle class="dseg${on?' on':''}" cx="120" cy="120" r="${r}" fill="none" stroke="${c.c}" stroke-width="${W}" ${at}/>`}
+ else{let rc=Math.min(7,(R2-R1)/2-1);while(rc>.4&&(a1-a0)<2.6*Math.asin(rc/(R1+rc)))rc*=.8;rc=Math.max(rc,.4);
+  segs+=`<path class="dseg${on?' on':''}" d="${dnSector(a0,a1,R1,R2,rc)}" fill="${c.c}" ${at}/>`}
+ const br=Math.min(12.5,(a1-a0)*r/2-1);
+ if(br>=7.5){const md=es.length==1?-Math.PI/2:(a0+a1)/2,x=120+Math.cos(md)*r,y=120+Math.sin(md)*r,k=.67*br/12.5;
+  bds+=`<g class="dbd${on?' on':''}" data-n="${E(n)}" transform="translate(${x.toFixed(2)} ${y.toFixed(2)})"><circle r="${br.toFixed(2)}" fill="${c.c}" stroke="var(--card)" stroke-width="1.5"/><path d="${c.p}" transform="translate(${(-12*k).toFixed(2)} ${(-12*k).toFixed(2)}) scale(${k.toFixed(3)})" fill="none" stroke="#111" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></g>`}
+});
+const sv=sel?m[sel]:total,logo=`<g transform="translate(120 76)" fill="none" stroke="var(--acc)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="-10" y="-9" width="20" height="20" rx="4"/><path d="M-5 -3h10M-5 1h7M-5 5h4"/></g>`;
+return `<div class="donut-wrap"><svg viewBox="0 0 240 240" class="dn${sel?' dim':''}" data-t="${total}" role="group" aria-label="Структура расходов: ${R(total)}"><circle cx="120" cy="120" r="${r}" fill="none" stroke="var(--line2)" stroke-width="31" opacity=".55"/>${segs}${bds}${logo}<text x="120" y="116" text-anchor="middle" class="dc1">${R(sv)}</text><text x="120" y="137" text-anchor="middle" class="dc2">${sel?E(dnShort(sel)):'РАСХОДЫ'}</text><text x="120" y="156" text-anchor="middle" class="dc3">${sel?P(sv,total):''}</text></svg></div><div class="donut-legend${sel?' dim':''}">${es.map(([n,v])=>{const c=cat(n),on=n==sel;return `<div class="lr${on?' on':''}" role="button" tabindex="0" aria-pressed="${on}" data-a="exf" data-n="${E(n)}" data-v="${v}" data-p="${P(v,total)}"><span class="donut-cat"><i style="background:${c.c}">${SV(`<path d="${c.p}"/>`)}</i><span>${E(c.n)}</span></span><span class="lp">${P(v,total)}</span><b>${R(v)}</b></div>`}).join('')}</div>`;
 }
+const exBar=(n,L)=>`<div class="exf">${CI(n)}<span class="sub">${PLR(L.length,['запись','записи','записей'])} · −${R(sm(L))}</span><button type="button" class="b" data-a="exf" data-n="">Сбросить фильтр</button></div>`;
 const etbl=(...a)=>tbl(...a).replace('<div class="tw">','<div class="tw etw">').replace('<table>','<table class="etbl">');
-function eTable(){const{a,b}=PER,L=S.exp.map((x,i)=>({...x,i})).filter(x=>x.d>=a&&x.d<=b),tot=sm(L),m=byCat(L),days=Math.round((new Date(b+'T00:00')-new Date(a+'T00:00'))/864e5)+1,top=Object.entries(m).sort((x,y)=>y[1]-x[1])[0];
+function eTable(){const{a,b}=PER,L=S.exp.map((x,i)=>({...x,i})).filter(x=>x.d>=a&&x.d<=b),tot=sm(L),m=byCat(L),days=Math.round((new Date(b+'T00:00')-new Date(a+'T00:00'))/864e5)+1,top=Object.entries(m).sort((x,y)=>y[1]-x[1])[0];if(EXF&&!m[EXF])EXF='';const LF=EXF?L.filter(x=>x.c==EXF):L;
 return `<div class="tool" style="justify-content:space-between;gap:8px"><button class="b perb" data-a="perf">${IC_CAL}<span>${perLabel()}</span></button><button class="b pri" data-a="add">+ Добавить трату</button></div>`+
 kp([['Сегодня',R(sm(S.exp.filter(x=>x.d==TD))),'траты за день'],['За период',R(tot),L.length+' записей'],['В среднем в день',R(tot/days),'за '+days+' дн.'],['Больше всего',top?`<span style="font-size:20px;line-height:1.4">${E(cat(top[0]).n)}</span>`:'—',top?P(top[1],tot)+' · '+R(top[1]):'нет трат']])+
-`<div class="ex"><div class="card"><div class="h">Структура расходов</div>${tot?donut(m,tot):'<div class="sub" style="padding:40px 0;text-align:center">За выбранный период трат нет</div>'}</div><div>`+etbl(['Дата','Категория','Комментарий','Сумма',''],L.sort((x,y)=>y.d.localeCompare(x.d)).map(x=>`<tr class="er"><td>${D(x.d)}</td><td style="text-align:left">${CI(x.c)}</td><td class="l">${E(x.n)}</td><td><b class="v">−${R(x.a)}</b></td><td>${X('exp',x.i)}</td></tr>`),'За выбранный период трат нет.')+'</div></div>'}
+`<div class="ex"><div class="card"><div class="h dh"><span>Структура расходов</span><button type="button" class="b dcol" data-a="catcol" title="Цвета категорий">${PAL}<span>Цвета</span></button></div>${tot?donut(m,tot):'<div class="sub" style="padding:40px 0;text-align:center">За выбранный период трат нет</div>'}</div><div>`+(EXF?exBar(EXF,LF):'')+etbl(['Дата','Категория','Комментарий','Сумма',''],LF.sort((x,y)=>y.d.localeCompare(x.d)).map(x=>`<tr class="er"><td>${D(x.d)}</td><td style="text-align:left">${CI(x.c)}</td><td class="l">${E(x.n)}</td><td><b class="v">−${R(x.a)}</b></td><td>${X('exp',x.i)}</td></tr>`),'За выбранный период трат нет.')+'</div></div>'}
 const OPTS={pri:[['u','Срочно','#B6E635'],['i','Важно','#929292'],['n','Обычно','#686868']],
 pcat:[['','Без категории','#858585','M5 12h.01M12 12h.01M19 12h.01'],['Работа','Работа','#929292','M4 8h16v11H4zM9 8V5h6v3M4 13h16'],['Финансы','Финансы','#B6E635','M3 7h16a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7zm0 0V6a2 2 0 012-2h11M16 14h2'],['Ozon','Ozon','#686868','M12 3l8 4v10l-8 4-8-4V7zM4 7l8 4 8-4M12 11v10'],['Свадьба','Свадьба','#A5A5A5','M12 20s-7-4.4-7-10a4 4 0 017-2.5A4 4 0 0119 10c0 5.6-7 10-7 10z'],['Личное','Личное','#C5F45A','M12 12a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 0116 0']],
 rep:[['','Не повторять'],['d','Каждый день'],['w','Каждую неделю'],['m','Каждый месяц'],['m520','5-го и 20-го числа']],
@@ -595,8 +614,8 @@ const LEG={'#34d399':'#B6E635','#60a5fa':'#929292','#f5c542':'#C5F45A','#f472b6'
 const HC=['#B6E635','#929292','#C5F45A','#A5A5A5','#686868','#A9D92D','#BDBDBD','#5A5A5A'],WD=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
 const HI={check:'M4 12l5 5L20 6',paw:'M12 15c-2.5 0-4 1.5-4 3s1.5 2 4 2 4-.5 4-2-1.5-3-4-3zM6.5 11a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM17.5 11a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM10 8a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM14 8a1.5 1.5 0 100-3 1.5 1.5 0 000 3z',bike:'M6 18a3 3 0 100-6 3 3 0 000 6zm12 0a3 3 0 100-6 3 3 0 000 6zM6 15l4-7h5l3 7M10 8l2 7',book:'M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3V4zM5 17a3 3 0 013-3h11',drop:'M12 3s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z',dumb:'M3 10v4M6 8v8M18 8v8M21 10v4M6 12h12',moon:'M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z',sun:'M12 17a5 5 0 100-10 5 5 0 000 10zM12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5',heart:'M12 20s-7-4.4-7-10a4 4 0 017-2.5A4 4 0 0119 10c0 5.6-7 10-7 10z',pen:'M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4',music:'M9 18V6l10-2v12M9 18a3 3 0 11-6 0 3 3 0 016 0zM19 16a3 3 0 11-6 0 3 3 0 016 0z',leaf:'M5 19c0-8 5-14 15-14 0 10-6 15-14 15M5 19c2-4 5-7 9-9'};
 OPTS.htype=[['c','Галочка (сделал / не сделал)'],['n','Число (км, страницы, минуты…)']];OPTS.hsch=[['d','Каждый день'],['w','По дням недели'],['t','N раз в неделю']];OPTS.hlk=[['','Нет'],['read','Страницы из «Книг»'],['exp','Запись о трате'],['sav','Взнос в накопления']];
-OPTS.hcol=HC.map((c,i)=>[c,['Лайм','Серый','Светлый лайм','Серебро','Графит','Тёмный лайм','Светло-серый','Тёмно-серый'][i],c]);
-OPTS.hic=[['check','Галочка'],['paw','Прогулка с собакой'],['bike','Велосипед'],['book','Чтение'],['drop','Вода'],['dumb','Спорт'],['moon','Сон'],['sun','Утро'],['heart','Здоровье'],['pen','Писать'],['music','Музыка'],['leaf','Природа']].map(([v,l])=>[v,l,'#858585',HI[v]]);
+OPTS.ccol=null;OPTS.hcol=HC.map((c,i)=>[c,['Лайм','Серый','Светлый лайм','Серебро','Графит','Тёмный лайм','Светло-серый','Тёмно-серый'][i],c]);
+OPTS.ccol=[...OPTS.hcol,['#858585','Нейтральный','#858585'],['#777777','Средний серый','#777777']];OPTS.hic=[['check','Галочка'],['paw','Прогулка с собакой'],['bike','Велосипед'],['book','Чтение'],['drop','Вода'],['dumb','Спорт'],['moon','Сон'],['sun','Утро'],['heart','Здоровье'],['pen','Писать'],['music','Музыка'],['leaf','Природа']].map(([v,l])=>[v,l,'#858585',HI[v]]);
 S.habits.forEach((h,i)=>{h.id=h.id||uid();h.t=h.t||'c';h.s=h.s||'d';h.c=h.c||HC[i%8];h.ic=h.ic||(/собак/i.test(h.n)?'paw':/велос/i.test(h.n)?'bike':/чтен/i.test(h.n)?'book':'check');h.nt=h.nt||{};if(!h.lk&&/^чтен/i.test(h.n))h.lk='read'});
 let HM=(()=>{const n=new Date();return{y:n.getFullYear(),m:n.getMonth()}})();const monD=k=>addD(k,-((new Date(k+'T00:00').getDay()+6)%7));let HW=monD(TD);sub.habits=innerWidth<900?'week':'month';
 const hv=(h,k)=>+h.d[k]||0,hg=h=>h.t=='n'?+h.g||0:0,hdone=(h,k)=>{const v=hv(h,k);return h.t=='n'&&hg(h)?v>=hg(h):v>0},hpart=(h,k)=>h.t=='n'&&hg(h)>0&&hv(h,k)>0&&hv(h,k)<hg(h),hdue=(h,k)=>h.s=='w'?(h.dw||[]).includes((new Date(k+'T00:00').getDay()+6)%7):h.s=='t'?false:true,need=h=>Math.max(1,+h.tw||3);
@@ -792,6 +811,11 @@ dep(e){const g=S.goals[+e.dataset.i];ask('Взнос: '+E(g.n),[{k:'a',l:'Сум
 };
 ADD.wish=['Новый товар',wFields({}),o=>wSave(o)];
 Object.assign(A,{
+exf(e){const n=e.dataset.n||'';EXF=(n&&EXF===n)?'':n;render()},
+catcol(){const used=S.exp.map(x=>x.c).filter(n=>n&&/^[^"'<>&]+$/.test(n)),names=[...new Set([...CATS.map(c=>c[0]),...used])];
+ask('Цвета категорий',names.map(n=>({k:n,l:CI(n),t:'sel',o:'ccol',v:cat(n).c})),o=>{S.cc=S.cc||{};names.forEach(n=>{const d=CATS.find(c=>c[0]==n);if(!o[n])return;if(o[n]==(d?d[2]:'#858585'))delete S.cc[n];else S.cc[n]=o[n]})},'Сохранить')}
+});
+Object.assign(A,{
 wbuy(e){const w=wfind(e.dataset.id);if(!w||wst(w)=='bought')return;w.st='bought';w.bd=TD;if(+w.p&&w.bp==null)w.bp=+w.p;commit();toastU('«'+w.t+'» куплено',()=>{w.st='want';delete w.bd;delete w.bp;commit()})},
 wback(e){const w=wfind(e.dataset.id);if(!w)return;w.st='want';delete w.bd;delete w.bp;commit();toast('«'+w.t+'» возвращено в вишлист')},
 wedit(e){const w=wfind(e.dataset.id);if(!w)return;ask('Редактировать товар',wFields(w),o=>wSave(o,w),'Сохранить')},
@@ -807,6 +831,15 @@ wzoom(e){const w=wfind(e.dataset.id);if(!w||!imgOk(w.img))return;const m=documen
 });
 document.addEventListener('input',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.c=='wq')A.wq(t)});
 document.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(el&&A[el.dataset.a])A[el.dataset.a](el)});
+function dnPaint(n){const sv=document.querySelector('svg.dn');if(!sv)return;sv.classList.toggle('dim',!!n);
+sv.querySelectorAll('[data-n]').forEach(x=>x.classList.toggle('on',!!n&&x.dataset.n===n));
+const lg=document.querySelector('.donut-legend');if(lg){lg.classList.toggle('dim',!!n);lg.querySelectorAll('.lr').forEach(x=>x.classList.toggle('on',!!n&&x.dataset.n===n))}
+const sg=[...sv.querySelectorAll('.dseg')].find(x=>x.dataset.n===n),set=(c,v)=>{const t=sv.querySelector(c);if(t)t.textContent=v};
+if(sg){set('.dc1',R(+sg.dataset.v));set('.dc2',dnShort(n));set('.dc3',sg.dataset.p)}else{set('.dc1',R(+sv.dataset.t));set('.dc2','РАСХОДЫ');set('.dc3','')}}
+const HOVQ=matchMedia('(hover:hover) and (pointer:fine)'),DNSEL='.dseg,.donut-legend .lr';
+document.addEventListener('mouseover',e=>{if(!HOVQ.matches)return;const t=e.target.closest&&e.target.closest(DNSEL);if(t)dnPaint(t.dataset.n)});
+document.addEventListener('mouseout',e=>{if(!HOVQ.matches)return;const t=e.target.closest&&e.target.closest(DNSEL);if(!t)return;const r=e.relatedTarget&&e.relatedTarget.closest&&e.relatedTarget.closest(DNSEL);if(!r)dnPaint(EXF)});
+document.addEventListener('keydown',e=>{if((e.key=='Enter'||e.key==' ')&&e.target.matches&&e.target.matches('.donut-legend .lr')){e.preventDefault();A.exf(e.target)}});
 
 /* ---- habits: drag & drop reorder (mouse + touch) + arrow keys on the handle ---- */
 (()=>{let G=null,raf=0;
