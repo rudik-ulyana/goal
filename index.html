@@ -325,6 +325,24 @@ button,.hc,.hc2,.cd,.stb{touch-action:manipulation}
 .etbl tr.er td:nth-child(5){grid-area:del}
 .etbl td.em{display:block;padding:20px 8px;text-align:center}
 }
+
+/* ===== fixes 2: spending card on wide screens, ruble above bars, habit drag handle ===== */
+.ringc,.spk{container-type:inline-size}
+.ringw .lr .cc{min-width:0;overflow-wrap:anywhere}
+.ringw .lv{flex:none}
+@container (max-width:309px){.ringw{flex-direction:column;align-items:stretch;gap:6px}.ringw .rg{width:128px;align-self:center}}
+.spc{min-width:0}
+.spk .spv{font-size:clamp(8px,2.9cqw,10.5px)}
+.hdrag{display:inline-flex;align-items:center;justify-content:center;width:20px;height:32px;padding:0;border:0;border-radius:6px;background:none;color:var(--dim);cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.hdrag svg{width:14px;height:14px;pointer-events:none}
+.hdrag:hover{color:var(--ink);background:var(--hov)}
+.hdrag:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.hr.hd{grid-template-columns:20px 28px minmax(0,1fr) 28px 28px;max-width:340px}
+.hgrid th:first-child,.hgrid td:first-child{width:306px}
+.hgrid{min-width:1196px}.hweek th:first-child{width:306px}.hweek{min-width:776px}
+tr.drg>td{position:relative;z-index:4;background:color-mix(in srgb,var(--acc) 14%,var(--card));box-shadow:0 1px 0 var(--acc),0 -1px 0 var(--acc)}
+.hwc.drg{position:relative;z-index:4;border-color:var(--acc);box-shadow:var(--pop)}
+body.drgb,body.drgb *{cursor:grabbing!important;-webkit-user-select:none;user-select:none}
 </style></head><body>
 <div class="app">
 <aside>
@@ -593,15 +611,16 @@ function habTask(o){if(new Date().getHours()<18)return;const p=S.habits.filter(h
 const hFields=h=>[{k:'n',l:'Название',v:h.n||''},{k:'t',l:'Тип',t:'sel',o:'htype',v:h.t||'c'},{k:'u',l:'Единица (для числа: км, стр., мин.)',v:h.u||''},{k:'g',l:'Цель на день (для числа)',t:'num',v:h.g?String(h.g):''},{k:'s',l:'Расписание',t:'sel',o:'hsch',v:h.s||'d'},{k:'dw',l:'Дни недели (для «По дням недели»)',t:'days',v:(h.dw||[]).join(',')},{k:'tw',l:'Раз в неделю (для «N раз в неделю»)',t:'num',v:String(h.tw||3)},{k:'c',l:'Цвет',t:'sel',o:'hcol',v:MC(h.c||HC[0])},{k:'ic',l:'Иконка',t:'sel',o:'hic',v:h.ic||'check'},{k:'lk',l:'Автоотметка',t:'sel',o:'hlk',v:h.lk||''}];
 const hSave=(o,h)=>{if(!o.n)return false;const x=h||{id:uid(),d:{},nt:{}};Object.assign(x,{n:o.n,t:o.t||'c',u:o.u||'',g:N(o.g),s:o.s||'d',dw:(o.dw||'').split(',').filter(z=>z!=='').map(Number),tw:Math.max(1,N(o.tw)||3),c:o.c||HC[0],ic:o.ic||'check',lk:o.lk||''});if(!h)S.habits.push(x)};
 const hIc=h=>`<i class="hi" style="color:${MC(h.c)};background:color-mix(in srgb,${MC(h.c)} 16%,transparent)">${SV(`<path d="${HI[h.ic]||HI.check}"/>`)}</i>`,hDesc=h=>E([h.s=='d'?'каждый день':h.s=='w'?(h.dw||[]).map(i=>WD[i]).join(' ')||'дни не выбраны':need(h)+' р. в неделю',h.t=='n'&&h.g?'цель '+h.g+' '+(h.u||''):''].filter(Boolean).join(' · '));
-const hName=(h,i,nd)=>`<span class="hr">${hIc(h)}<span class="hnm"><b class="v">${E(h.n)}</b><small>${hDesc(h)}</small></span><button class="b ic hed" data-a="hedit" data-i="${i}" title="Редактировать">${PEN}</button>${nd?'':X('habits',i)}</span>`;
+const hGrip=(h,i)=>`<button type="button" class="hdrag" data-i="${i}" title="Перетащи, чтобы изменить порядок" aria-label="Переместить привычку «${E(h.n)}» (стрелки вверх и вниз)">${SV('<path stroke-width="3" d="M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01"/>')}</button>`;
+const hName=(h,i,nd,dg)=>`<span class="hr${dg?' hd':''}">${dg?hGrip(h,i):''}${hIc(h)}<span class="hnm"><b class="v">${E(h.n)}</b><small>${hDesc(h)}</small></span><button class="b ic hed" data-a="hedit" data-i="${i}" title="Редактировать">${PEN}</button>${nd?'':X('habits',i)}</span>`;
 const hcell=(h,i,k,big)=>{const v=hv(h,k),dn=hdone(h,k),pt=hpart(h,k),nt=(h.nt||{})[k],st=dn?`background:${MC(h.c)};border-color:${MC(h.c)};color:#0b0b0b`:pt?`background:color-mix(in srgb,${MC(h.c)} 40%,transparent);border-color:${MC(h.c)}`:'';return `<button class="hc2${big?' big':''}${h.s=='w'&&!hdue(h,k)&&!v?' nd':''}" style="${st}" data-a="hcell" data-i="${i}" data-k="${k}" title="${nt?E(nt):''}">${h.t=='n'&&v?Math.round(v*10)/10:''}${nt?'<u class="hn"></u>':''}</button>`};
 const hnav=l=>`<div class="hn2"><button class="b ic" data-a="hnav" data-n="-1">${GI.cl}</button><b>${l}</b><button class="b ic" data-a="hnav" data-n="1">${GI.cr}</button><button class="b" data-a="hnow">Сегодня</button></div>`;
 const hEmpty=n=>`<tr><td colspan="${n}" class="em">Пока пусто. Добавь первую привычку.</td></tr>`;
 function hGrid(act){const y=HM.y,m=HM.m,n=new Date(y,m+1,0).getDate(),ds=Array.from({length:n},(_,i)=>y+'-'+String(m+1).padStart(2,'0')+'-'+String(i+1).padStart(2,'0'));
-return hnav(cap(new Date(y,m,1).toLocaleDateString('ru-RU',{month:'long',year:'numeric'}).replace(/\s?г\.$/,'')))+`<div class="tw"><table class="hgrid"><thead><tr><th>Привычка</th>${ds.map(k=>`<th class="${k==TD?'t':''}">${+k.slice(8)}</th>`).join('')}<th>Серия</th></tr></thead><tbody>${act.map(({h,i})=>{const t=hstat(h);return `<tr><td>${hName(h,i)}</td>${ds.map(k=>`<td>${hcell(h,i,k)}</td>`).join('')}<td><b class="v">${t.cur}</b> <span class="sub">${t.u}</span></td></tr>`}).join('')||hEmpty(n+2)}</tbody></table></div>`}
-function hCards(act,ds){return `<div class="hw-cards">${act.map(({h,i})=>{const w=wsum(h,HW),t=hstat(h);return `<div class="card hwc">${hName(h,i)}<div class="hwd">${ds.map((k,j)=>`<div class="hwcol"><small class="${k==TD?'t':''}">${WD[j]}<br>${+k.slice(8)}</small>${hcell(h,i,k,1)}</div>`).join('')}</div><div class="sub" style="text-align:center">Неделя: ${w[0]}/${w[1]} · серия ${t.cur} ${t.u}</div></div>`}).join('')||'<div class="card sub">Пока пусто. Добавь первую привычку.</div>'}</div>`}
+return hnav(cap(new Date(y,m,1).toLocaleDateString('ru-RU',{month:'long',year:'numeric'}).replace(/\s?г\.$/,'')))+`<div class="tw"><table class="hgrid"><thead><tr><th>Привычка</th>${ds.map(k=>`<th class="${k==TD?'t':''}">${+k.slice(8)}</th>`).join('')}<th>Серия</th></tr></thead><tbody>${act.map(({h,i})=>{const t=hstat(h);return `<tr><td>${hName(h,i,0,1)}</td>${ds.map(k=>`<td>${hcell(h,i,k)}</td>`).join('')}<td><b class="v">${t.cur}</b> <span class="sub">${t.u}</span></td></tr>`}).join('')||hEmpty(n+2)}</tbody></table></div>`}
+function hCards(act,ds){return `<div class="hw-cards">${act.map(({h,i})=>{const w=wsum(h,HW),t=hstat(h);return `<div class="card hwc">${hName(h,i,0,1)}<div class="hwd">${ds.map((k,j)=>`<div class="hwcol"><small class="${k==TD?'t':''}">${WD[j]}<br>${+k.slice(8)}</small>${hcell(h,i,k,1)}</div>`).join('')}</div><div class="sub" style="text-align:center">Неделя: ${w[0]}/${w[1]} · серия ${t.cur} ${t.u}</div></div>`}).join('')||'<div class="card sub">Пока пусто. Добавь первую привычку.</div>'}</div>`}
 function hWeek(act){const ds=Array.from({length:7},(_,i)=>addD(HW,i));
-return hnav(D(HW)+' — '+D(addD(HW,6)))+`<div class="tw hw-tbl"><table class="hgrid hweek"><thead><tr><th>Привычка</th>${ds.map((k,i)=>`<th class="${k==TD?'t':''}">${WD[i]}<br>${+k.slice(8)}</th>`).join('')}<th>Неделя</th></tr></thead><tbody>${act.map(({h,i})=>{const w=wsum(h,HW);return `<tr><td>${hName(h,i)}</td>${ds.map(k=>`<td>${hcell(h,i,k,1)}</td>`).join('')}<td><b class="v">${w[0]}/${w[1]}</b></td></tr>`}).join('')||hEmpty(9)}</tbody></table></div>${hCards(act,ds)}`}
+return hnav(D(HW)+' — '+D(addD(HW,6)))+`<div class="tw hw-tbl"><table class="hgrid hweek"><thead><tr><th>Привычка</th>${ds.map((k,i)=>`<th class="${k==TD?'t':''}">${WD[i]}<br>${+k.slice(8)}</th>`).join('')}<th>Неделя</th></tr></thead><tbody>${act.map(({h,i})=>{const w=wsum(h,HW);return `<tr><td>${hName(h,i,0,1)}</td>${ds.map(k=>`<td>${hcell(h,i,k,1)}</td>`).join('')}<td><b class="v">${w[0]}/${w[1]}</b></td></tr>`}).join('')||hEmpty(9)}</tbody></table></div>${hCards(act,ds)}`}
 const hmap=h=>{const w0=addD(monD(TD),-51*7);let o='';for(let w=0;w<52;w++)for(let d=0;d<7;d++){const k=addD(w0,w*7+d);o+=`<i class="hm" title="${D(k)}${hv(h,k)?': '+hv(h,k)+(h.u?' '+h.u:''):''}" style="${k>TD?'opacity:0':hdone(h,k)?`background:${MC(h.c)}`:hpart(h,k)?`background:color-mix(in srgb,${MC(h.c)} 40%,transparent)`:''}"></i>`}return `<div class="hmap">${o}</div>`};
 function hStats(act){return act.map(({h,i})=>{const t=hstat(h),w=wsum(h,monD(TD)),nts=Object.entries(h.nt||{}).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,3);
 return `<div class="card hs"><div class="hsh">${hName(h,i)}<div class="ta"><button class="b ic" data-a="hmv" data-i="${i}" data-n="-1" title="Выше">${GI.up}</button><button class="b ic" data-a="hmv" data-i="${i}" data-n="1" title="Ниже">${GI.dn}</button><button class="b ic" data-a="hnote" data-i="${i}" title="Заметка к дню">${SV('<path d="M5 4h14v16H5zM8 9h8M8 13h6"/>')}</button><button class="b ic" data-a="harch" data-i="${i}" title="В архив">${IC_AR}</button></div></div><div class="hmet">${[['Серия сейчас',t.cur+' '+t.u],['Лучшая серия',t.best+' '+t.u],['7 дней',t.r7+'%'],['30 дней',t.r30+'%'],['Всего',t.tot],['Эта неделя',w[0]+'/'+w[1]]].map(([l,v])=>`<div><small>${l}</small><b>${v}</b></div>`).join('')}</div>${hmap(h)}${nts.map(([k,x])=>`<div class="sub" style="margin-top:6px">${D(k)}: ${E(x)}</div>`).join('')}</div>`}).join('')||'<div class="card sub">Пока пусто. Добавь первую привычку.</div>'}
@@ -634,7 +653,7 @@ kpi:`<div class="kpis full">${kc('Остаток долга',R(dn.rest),['из '
 tasks:`<div class="card"><div class="h">Задачи на сегодня</div><ul class="ls">${op.map(x=>`<li><button class="hc" data-a="tk" data-k="${x.k}"></button>${E(x.x)}<span class="${x.d<TD?'neg':''}">${D(x.d)}${x.time?' · '+E(x.time):''}</span></li>`).join('')||'<li class="sub">На сегодня всё сделано</li>'}</ul></div>`,
 pay:`<div class="card"><div class="h">Ближайший платёж по долгам</div>${n1?`<b style="font-size:20px;font-weight:500">${R(n1.tot)}</b> <span class="${daysTo(n1.r.d)<0?'neg':'sub'}">${D(n1.r.d)} · ${daysTo(n1.r.d)<0?'просрочен на '+(-daysTo(n1.r.d))+' дн.':daysTo(n1.r.d)==0?'сегодня':'через '+daysTo(n1.r.d)+' дн.'}</span><div style="margin:8px 0">${n1.ls.map(s=>`<div class="sr"><span>${E(s.n)}</span><span>${RI(+n1.r.pl[s.id])}</span></div>`).join('')}</div><button class="b pri" data-a="tk" data-k="a${n1.i}">Платёж внесён</button>${n2?`<div class="sub" style="margin-top:10px">Следом: ${D(n2.r.d)} · ${R(n2.tot)}</div>`:''}`:'<div class="sub">Ближайших платежей нет</div>'}</div>`,
 habits:hHome(),
-exp:`<div class="card"><div class="h">Траты месяца</div>${mo?`<div class="ringw">${ring(m,mo)}<div class="lg2">${Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([n,v])=>`<div class="lr">${CI(n)}<span class="lv"><b>${R(v)}</b><span class="lp">${P(v,mo)}</span></span></div>`).join('')}</div></div>`:'<div class="sub">В этом месяце трат пока нет</div>'}<div class="h" style="margin:14px 0 8px">Последние 7 дней</div><div class="spk">${days.map(([k,v])=>`<div class="spc" title="${D(k)}: ${R(v)}"><span class="spb"><em class="spv">${v?KM(v):''}</em><u style="height:${v?Math.max(3.84,v/mx*48):1.92}px"></u></span><small>${+k.slice(8)}</small></div>`).join('')}</div></div>`,
+exp:`<div class="card"><div class="h">Траты месяца</div>${mo?`<div class="ringc"><div class="ringw">${ring(m,mo)}<div class="lg2">${Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([n,v])=>`<div class="lr">${CI(n)}<span class="lv"><b>${R(v)}</b><span class="lp">${P(v,mo)}</span></span></div>`).join('')}</div></div></div>`:'<div class="sub">В этом месяце трат пока нет</div>'}<div class="h" style="margin:14px 0 8px">Последние 7 дней</div><div class="spk">${days.map(([k,v])=>`<div class="spc" title="${D(k)}: ${R(v)}"><span class="spb"><em class="spv">${v?KM(v)+'&nbsp;₽':''}</em><u style="height:${v?Math.max(3.84,v/mx*48):1.92}px"></u></span><small>${+k.slice(8)}</small></div>`).join('')}</div></div>`,
 books:`<div class="card"><div class="h">Книги</div>${rd?`<b>${E(rd.t)}</b><div class="sub">${E(rd.a)} · ${rd.pg||0}${rd.pt?' из '+rd.pt:''} стр.</div>${rd.pt?bar2((rd.pg||0)/rd.pt*100):''}`:'<div class="sub">Сейчас ничего не читаешь</div>'}${nq?`<div class="sub" style="margin-top:12px">Следующая по очереди</div><b>${E(nq.t)}</b><div class="sub">${E(nq.a)}</div>`:''}</div>`,
 recall:recall()};
 const wrap=(k,h)=>h.replace(/^<div class="([^"]*)"/,(x,cl)=>`<div class="${cl} hb-${k}"`);
@@ -788,6 +807,53 @@ wzoom(e){const w=wfind(e.dataset.id);if(!w||!imgOk(w.img))return;const m=documen
 });
 document.addEventListener('input',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.c=='wq')A.wq(t)});
 document.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(el&&A[el.dataset.a])A[el.dataset.a](el)});
+
+/* ---- habits: drag & drop reorder (mouse + touch) + arrow keys on the handle ---- */
+(()=>{let G=null,raf=0;
+const cells=r=>r.tagName=='TR'?[...r.cells]:[r],
+tf=(r,v)=>cells(r).forEach(c=>{c.style.transform=v?`translateY(${v}px)`:''}),
+grip=r=>r.querySelector('.hdrag'),
+off=()=>(scrollY-G.s0)+(G.sc?G.sc.scrollTop-G.c0:0);
+function upd(){const dy=G.y-G.y0+off(),c=G.mid[G.k]+dy;let t=G.k;
+G.mid.forEach((m,j)=>{if(j<G.k&&c<m)t=Math.min(t,j);if(j>G.k&&c>m)t=Math.max(t,j)});
+G.t=t;tf(G.row,dy);
+G.rows.forEach((r,j)=>{if(j!==G.k)tf(r,t<G.k&&j>=t&&j<G.k?G.pitch:t>G.k&&j>G.k&&j<=t?-G.pitch:0)})}
+function loop(){if(!G)return;let d=0,moved=false;const y=G.y,sc=G.sc;
+if(sc&&sc.scrollHeight>sc.clientHeight+1){const r=sc.getBoundingClientRect(),top=r.top+44,bot=r.bottom-30;
+if(y<top)d=-Math.ceil((top-y)/5);else if(y>bot)d=Math.ceil((y-bot)/5);
+if(d){const b=sc.scrollTop;sc.scrollTop=b+d;moved=sc.scrollTop!==b}}
+if(!moved){d=0;const h=innerHeight;if(y<80)d=-Math.ceil((80-y)/5);else if(y>h-80)d=Math.ceil((y-(h-80))/5);
+if(d){const b=scrollY;scrollBy(0,d);moved=scrollY!==b}}
+if(moved)upd();raf=requestAnimationFrame(loop)}
+document.addEventListener('pointerdown',e=>{const g=e.target.closest&&e.target.closest('.hdrag');
+if(!g||(e.pointerType=='mouse'&&e.button))return;
+const row=g.closest('tr,.hwc');if(!row)return;
+const rows=[...row.parentElement.children].filter(grip);if(rows.length<2)return;
+e.preventDefault();
+const sc=row.closest('.tw'),rc=rows.map(r=>r.getBoundingClientRect()),k=rows.indexOf(row),gap=Math.max(0,rc[1].top-rc[0].bottom);
+G={g,row,rows,k,t:k,id:e.pointerId,y0:e.clientY,y:e.clientY,s0:scrollY,sc,c0:sc?sc.scrollTop:0,
+mid:rc.map(r=>r.top+r.height/2),pitch:rc[k].height+gap};
+rows.forEach(r=>{if(r!==row)cells(r).forEach(c=>c.style.transition='transform .15s')});
+row.classList.add('drg');document.body.classList.add('drgb');
+try{g.setPointerCapture(e.pointerId)}catch(_){}
+raf=requestAnimationFrame(loop)});
+document.addEventListener('pointermove',e=>{if(!G||e.pointerId!=G.id)return;G.y=e.clientY;upd()});
+const end=ok=>{if(!G)return;cancelAnimationFrame(raf);const g=G;G=null;
+document.body.classList.remove('drgb');g.row.classList.remove('drg');
+g.rows.forEach(r=>{tf(r,0);cells(r).forEach(c=>c.style.transition='')});
+if(!ok||g.t===g.k)return;
+const ord=g.rows.map(r=>+grip(r).dataset.i),m=ord.splice(g.k,1)[0];ord.splice(g.t,0,m);
+const slots=S.habits.map((h,i)=>i).filter(i=>!S.habits[i].ar),hs=ord.map(i=>S.habits[i]);
+if(slots.length!==hs.length){render();return}
+slots.forEach((p,j)=>{S.habits[p]=hs[j]});commit()};
+document.addEventListener('pointerup',e=>{if(G&&e.pointerId==G.id)end(1)});
+document.addEventListener('pointercancel',e=>{if(G&&e.pointerId==G.id)end(0)});
+document.addEventListener('keydown',e=>{const g=e.target.closest&&e.target.closest('.hdrag');
+if(!g||(e.key!='ArrowUp'&&e.key!='ArrowDown'))return;e.preventDefault();
+const i=+g.dataset.i,d=e.key=='ArrowUp'?-1:1,L=S.habits;let j=i+d;while(L[j]&&L[j].ar)j+=d;if(!L[j])return;
+A.hmv({dataset:{i:String(i),n:String(d)}});
+const b=document.querySelector('.hdrag[data-i="'+j+'"]');if(b)b.focus()});
+})();
 document.addEventListener('change',e=>{const el=e.target.closest('[data-c]');if(el)A[el.dataset.c](el)});
 document.addEventListener('mousedown',e=>{if(CAL&&!CAL.el.contains(e.target)&&!CAL.a.contains(e.target))closeCal()});
 document.addEventListener('input',e=>{const el=e.target.closest('[data-c=rf]');if(el)A.rf(el);if(e.target.dataset&&e.target.dataset.c=='bq')A.bq(e.target)});
